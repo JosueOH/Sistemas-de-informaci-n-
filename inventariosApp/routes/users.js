@@ -7,6 +7,17 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/login', (req, res, next)=>{
+  //console.log(req.body.email, req.body.pass)
+  usuario.login(req.body.email, req.body.pass , ( e, d)=>{
+    //E sha256 es un algoritmo de hash
+    if (d){
+      res.send('Login correcto');
+      ses=req.session;
+    } else {
+      res.json(e);
+    }
+  });
+
 
 
 });
