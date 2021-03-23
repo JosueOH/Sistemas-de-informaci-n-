@@ -1,61 +1,53 @@
 var express = require('express');
-var router =  express.Router();
+var router = express.Router();
 var usuario = require('../models/user');
-const jwt = require('jsonwebtoken');
+var jwt = require('jsonwebtoken');
 
 /* GET users listing. */
-router.get('/login', function(req, res, next) {
-  res.render("frmLogin", {});
+router.get('/', function(req, res, next) {
+  res.render('frmLogin',{});
 });
 
-// Esto solo realiza el proceso de autenticación(para el ejemplo),
-// pero aún no tiene elementos de SEGURIDAD
-router.post('/login/respuesta', ( req , res , next )=>{
-  
-
-
-  usuario.login(req.body.email,req.body.passwd,( e , d )=>{ // req.body.passwd SHA256
+//esto solo realiza el proceso de autenticacion
+//pero aun no tiene elementos de seguridad
+router.post('/login', (req,res,next)=>{
+  //console.log(req.body.email, req.body.passwd);
+  usuario.login(req.body.email, req.body.passwd, (e, d)=>{ //req.body.passwd SHA256
     if (d) {
-      res.send('Login correcto');
+      //res.send('Login correcto');
       ses=req.session;
       console.log(ses.id);
-      ses.userData = d;
-      console.log(ses)
+      ses.userdata = d;
+      console.log(ses);
       const payload={
-        datos:d
-      }
+        datos: d
+      };
+      const clave= process.env.SECRETO ||'dios1234'; //obtener desde ENV
+      console.log(clave);
+      const token=jwt.sign(payload,clave,{ expiresIn:60*5 });
+      ses.token=token;
 
-      const clave= 'dios1234' // obtener desde ENV
-      const token = jwt.sign(payload, clave, {expiresIn:60*5});
-      ses.token= token;
       res.redirect('/');
-
-      // crear la sesion
+      //crear la session
       /*
-      1.- reutilizar la sesion origial del chrome
-      2.- hacer una nueva, desechando la de web browser
+      1 resuar sesion de chrome
+      2 hacer nueva sesion. desechando la de chrome
       */
-
-    } else {
+    }else {
       res.json(e);
     }
 
   });
-
 });
 
-
-router.get('/logout', ( req, res, next )=>{
-  res.session.destroy((falla)=>{
-    if (falla){
-      res.send(501, "Error");
-
-    }else{
+router.get('/logout',(req, res, next)=>{
+  req.session.destroy((falla)=>{
+    if (falla) {
+      res.send(501,"Error");
+    }else {
       res.redirect('/');
     }
   });
 });
-
-
 
 module.exports = router;

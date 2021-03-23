@@ -1,20 +1,21 @@
 var express = require('express');
-var router= express.Router();
-const session = require('express-session');
+var router = express.Router();
+var session = require('express-session');
+var checkAutorizacion = require('../autorizacion/general');
 
-router.get('/altas', (req, res, next) => {
-    var ses=req.session;
-    res.render("almacen/frmAlta", {user : ses.userdata, token: ses.token} );
-  });
-
-router.get('/reporte', ( req, res, next )=>{
-    var ses=req.session;
-    res.render("almacen/frmReporte", {user : ses.userdata});
+router.get('/alta',checkAutorizacion,(req, res, next)=>{
+  var session=req.session;
+  res.render('almacen/frmAlta',{user: ses.userdata, token:ses.token});
 });
 
-router.get('/baja', ( req, res, next )=>{
-    var ses=req.session;
-    res.render("almacen/frmBaja", {user : ses.userdata});
+router.get('/reporte', (req, res, next)=>{
+  var session=req.session;
+  res.render('almacen/frmReporte',{user: ses.userdata});
+});
+
+router.get('/baja', (req, res, next)=>{
+  var session=req.session;
+  res.render('almacen/frmBaja',{user: ses.userdata});
 });
 
 module.exports = router;
